@@ -1,0 +1,472 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{display:flex;height:620px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:200px;background:#1F4E79;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-logo{padding:20px 16px 16px;border-bottom:0.5px solid rgba(255,255,255,0.15)}
+.sidebar-logo p{color:rgba(255,255,255,0.9);font-size:13px;font-weight:500;line-height:1.3}
+.sidebar-logo span{color:rgba(255,255,255,0.5);font-size:11px}
+.nav-section{padding:12px 0}
+.nav-label{padding:4px 16px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.08em;text-transform:uppercase}
+.nav-item{padding:8px 16px;color:rgba(255,255,255,0.75);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:2px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;border-left-color:#64B5F6}
+.nav-icon{width:14px;height:14px;opacity:0.8;font-size:13px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.topbar-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.role-badge{background:#E6F1FB;color:#185FA5;font-size:11px;padding:3px 8px;border-radius:4px;font-weight:500}
+.avatar{width:30px;height:30px;border-radius:50%;background:#1F4E79;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
+.content{flex:1;overflow-y:auto;padding:20px}
+.screen{display:none}
+.screen.active{display:block}
+
+.metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;cursor:pointer}
+.metric:hover{background:var(--color-background-tertiary)}
+.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:6px}
+.metric-value{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.metric-sub{font-size:11px;margin-top:3px}
+.metric-sub.up{color:#1D9E75}
+.metric-sub.down{color:#E24B4A}
+.metric-sub.warn{color:#BA7517}
+
+.section-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:14px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:7px 10px;color:var(--color-text-secondary);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);white-space:nowrap}
+td{padding:7px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--color-background-secondary)}
+
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500}
+.badge-green{background:#EAF3DE;color:#3B6D11}
+.badge-red{background:#FCEBEB;color:#A32D2D}
+.badge-amber{background:#FAEEDA;color:#854F0B}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#F1EFE8;color:#5F5E5A}
+
+.alert-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.alert-item:last-child{border-bottom:none}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-red{background:#E24B4A}
+.dot-amber{background:#EF9F27}
+.dot-green{background:#639922}
+
+.chart-bar-wrap{display:flex;align-items:flex-end;gap:4px;height:100px;padding-bottom:4px}
+.bar{flex:1;border-radius:3px 3px 0 0;background:#185FA5;opacity:0.75;min-width:0;cursor:pointer;transition:opacity 0.15s}
+.bar:hover{opacity:1}
+
+.pos-grid{display:grid;grid-template-columns:1fr 340px;gap:14px;height:100%}
+.product-search{width:100%;padding:8px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary);margin-bottom:12px}
+.product-search:focus{outline:none;border-color:var(--color-border-secondary)}
+.product-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:6px;cursor:pointer;font-size:12px}
+.product-item:hover{background:var(--color-background-secondary)}
+.product-item.rx{border-left:2px solid #185FA5}
+.add-btn{background:#1F4E79;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer}
+.cart-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.cart-total{padding:10px 0 6px;font-weight:500;font-size:14px;display:flex;justify-content:space-between;color:var(--color-text-primary)}
+.pay-btn{width:100%;padding:10px;background:#1F4E79;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;cursor:pointer;margin-top:10px}
+.pay-btn:hover{background:#2E75B6}
+
+.ai-input-row{display:flex;gap:8px;margin-bottom:14px}
+.ai-input{flex:1;padding:8px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary)}
+.ai-send{padding:8px 14px;background:#1F4E79;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:13px;cursor:pointer}
+.ai-msg{padding:10px 12px;border-radius:var(--border-radius-md);margin-bottom:8px;font-size:12px;line-height:1.6}
+.ai-msg.user{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.ai-msg.bot{background:#E6F1FB;color:#0C447C;border-left:2px solid #185FA5}
+.ai-tag{font-size:10px;font-weight:500;margin-bottom:4px;opacity:0.7}
+
+.forecast-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
+.forecast-bar-label{width:110px;color:var(--color-text-secondary);flex-shrink:0}
+.forecast-bar-track{flex:1;background:var(--color-background-secondary);border-radius:3px;height:14px;position:relative}
+.forecast-bar-fill{height:100%;border-radius:3px;background:#185FA5;opacity:0.75}
+.forecast-bar-val{width:50px;text-align:right;color:var(--color-text-primary);font-weight:500;flex-shrink:0}
+
+.report-kpi-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+
+.login-wrap{display:flex;align-items:center;justify-content:center;height:100%;background:var(--color-background-tertiary)}
+.login-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:32px;width:320px}
+.login-title{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--color-text-secondary);margin-bottom:20px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:5px;display:block}
+.form-input{width:100%;padding:8px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary)}
+.form-select{width:100%;padding:8px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary)}
+.login-btn{width:100%;padding:10px;background:#1F4E79;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;cursor:pointer;margin-top:6px}
+.login-btn:hover{background:#2E75B6}
+</style>
+
+<div id="login-screen" style="height:620px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden">
+<div class="login-wrap">
+<div class="login-card">
+  <div style="width:36px;height:36px;background:#1F4E79;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+    <span style="color:#fff;font-size:16px">+</span>
+  </div>
+  <p class="login-title">PharmaOps</p>
+  <p class="login-sub">Omnichannel Pharmacy Platform — sign in to continue</p>
+  <div class="form-group">
+    <label class="form-label">Email</label>
+    <input class="form-input" value="pharmacist@branch7.com" readonly>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Password</label>
+    <input class="form-input" type="password" value="demo1234" readonly>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Sign in as</label>
+    <select class="form-select" id="role-select">
+      <option value="pharmacist">Branch Pharmacist</option>
+      <option value="admin">Head Office Admin</option>
+      <option value="inventory">Inventory Controller</option>
+      <option value="agent">Customer Service Agent</option>
+    </select>
+  </div>
+  <button class="login-btn" onclick="doLogin()">Sign in</button>
+  <p style="font-size:11px;color:var(--color-text-secondary);margin-top:10px;text-align:center">JWT + OAuth 2.0 · Role-based access enforced</p>
+</div>
+</div>
+</div>
+
+<div id="app-screen" class="app" style="display:none">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <p>PharmaOps</p>
+      <span id="role-display">Branch Pharmacist</span>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" onclick="showScreen('dashboard',this)"><span class="nav-icon">■</span> Dashboard</div>
+      <div class="nav-item" onclick="showScreen('inventory',this)"><span class="nav-icon">≡</span> Inventory</div>
+      <div class="nav-item" onclick="showScreen('pos',this)"><span class="nav-icon">$</span> Point of Sale</div>
+      <div class="nav-item" onclick="showScreen('ai',this)"><span class="nav-icon">*</span> AI Assistant</div>
+      <div class="nav-item" onclick="showScreen('reports',this)"><span class="nav-icon">▣</span> Reports</div>
+    </div>
+    <div class="nav-section" style="margin-top:auto;border-top:0.5px solid rgba(255,255,255,0.1);padding-top:12px">
+      <div class="nav-item" onclick="doLogout()"><span class="nav-icon">←</span> Sign out</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="screen-title">Dashboard</span>
+      <div class="topbar-right">
+        <span class="role-badge" id="topbar-role">Branch Pharmacist</span>
+        <div class="avatar" id="topbar-avatar">BP</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="screen active" id="s-dashboard">
+        <div class="metrics-grid">
+          <div class="metric"><div class="metric-label">Today's sales</div><div class="metric-value">₹48,320</div><div class="metric-sub up">+12% vs yesterday</div></div>
+          <div class="metric"><div class="metric-label">Transactions</div><div class="metric-value">184</div><div class="metric-sub up">+8 this hour</div></div>
+          <div class="metric"><div class="metric-label">Low stock alerts</div><div class="metric-value">7</div><div class="metric-sub warn">Needs attention</div></div>
+          <div class="metric"><div class="metric-label">Expiring ≤30 days</div><div class="metric-value">3</div><div class="metric-sub down">Review batches</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="section-title">Hourly sales today</div>
+            <div class="chart-bar-wrap" id="sales-bars"></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--color-text-secondary);margin-top:4px">
+              <span>9 AM</span><span>12 PM</span><span>3 PM</span><span>6 PM</span><span>9 PM</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-title">Active alerts</div>
+            <div class="alert-item"><div class="alert-dot dot-red"></div><div><strong>Metformin 500mg</strong> — stock critically low (18 units)</div></div>
+            <div class="alert-item"><div class="alert-dot dot-red"></div><div><strong>Batch B-1042</strong> — expires in 12 days (Amoxicillin)</div></div>
+            <div class="alert-item"><div class="alert-dot dot-amber"></div><div><strong>Atorvastatin 10mg</strong> — below reorder point</div></div>
+            <div class="alert-item"><div class="alert-dot dot-amber"></div><div><strong>AI anomaly</strong> — unusual return rate for Ibuprofen 400mg</div></div>
+            <div class="alert-item"><div class="alert-dot dot-green"></div><div><strong>Replenishment RR-0091</strong> — approved by HO</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Recent transactions</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Time</th><th>Transaction ID</th><th>Type</th><th>Items</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>18:42</td><td>TXN-20260405-8901</td><td>OTC</td><td>Paracetamol, Vitamin C</td><td>₹285</td><td><span class="badge badge-green">Complete</span></td></tr>
+                <tr><td>18:38</td><td>TXN-20260405-8900</td><td><span class="badge badge-blue">Rx</span></td><td>Metformin, Lisinopril</td><td>₹520</td><td><span class="badge badge-green">Complete</span></td></tr>
+                <tr><td>18:31</td><td>TXN-20260405-8899</td><td>OTC</td><td>Ibuprofen 400mg x3</td><td>₹180</td><td><span class="badge badge-green">Complete</span></td></tr>
+                <tr><td>18:20</td><td>TXN-20260405-8898</td><td>Return</td><td>Cetirizine 10mg</td><td>-₹90</td><td><span class="badge badge-amber">Pending</span></td></tr>
+                <tr><td>18:15</td><td>TXN-20260405-8897</td><td><span class="badge badge-blue">Rx</span></td><td>Amlodipine, Aspirin</td><td>₹340</td><td><span class="badge badge-green">Complete</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen" id="s-inventory">
+        <div class="metrics-grid">
+          <div class="metric"><div class="metric-label">Total SKUs</div><div class="metric-value">1,284</div><div class="metric-sub">This branch</div></div>
+          <div class="metric"><div class="metric-label">Active batches</div><div class="metric-value">342</div><div class="metric-sub up">All tracked</div></div>
+          <div class="metric"><div class="metric-label">Near expiry</div><div class="metric-value">3</div><div class="metric-sub down">≤30 days</div></div>
+          <div class="metric"><div class="metric-label">Pending repl.</div><div class="metric-value">2</div><div class="metric-sub warn">Awaiting HO</div></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="section-title" style="margin:0">Stock levels — Branch 7</div>
+            <input class="product-search" style="width:200px;margin:0" placeholder="Search product...">
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Product</th><th>SKU</th><th>Batch</th><th>Expiry</th><th>Available</th><th>Reorder pt.</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td>Paracetamol 500mg</td><td>PCM-500</td><td>B-1198</td><td>2027-03-15</td><td>320</td><td>100</td><td><span class="badge badge-green">OK</span></td><td><span class="badge badge-gray" style="cursor:pointer">Details</span></td></tr>
+                <tr><td>Metformin 500mg</td><td>MET-500</td><td>B-2201</td><td>2026-09-01</td><td>18</td><td>150</td><td><span class="badge badge-red">Critical</span></td><td><span class="badge badge-blue" style="cursor:pointer">Replenish</span></td></tr>
+                <tr><td>Atorvastatin 10mg</td><td>ATV-010</td><td>B-0882</td><td>2026-11-20</td><td>85</td><td>120</td><td><span class="badge badge-amber">Low</span></td><td><span class="badge badge-blue" style="cursor:pointer">Replenish</span></td></tr>
+                <tr><td>Amoxicillin 500mg</td><td>AMX-500</td><td>B-1042</td><td>2026-04-17</td><td>240</td><td>80</td><td><span class="badge badge-amber">Exp. soon</span></td><td><span class="badge badge-gray" style="cursor:pointer">Transfer</span></td></tr>
+                <tr><td>Ibuprofen 400mg</td><td>IBU-400</td><td>B-1301</td><td>2027-01-10</td><td>510</td><td>200</td><td><span class="badge badge-green">OK</span></td><td><span class="badge badge-gray" style="cursor:pointer">Details</span></td></tr>
+                <tr><td>Cetirizine 10mg</td><td>CET-010</td><td>B-0991</td><td>2027-06-30</td><td>180</td><td>60</td><td><span class="badge badge-green">OK</span></td><td><span class="badge badge-gray" style="cursor:pointer">Details</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card" style="background:#E6F1FB;border-color:#B5D4F4">
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <span style="color:#185FA5;font-size:14px;margin-top:1px">*</span>
+            <div>
+              <div style="font-size:12px;font-weight:500;color:#0C447C;margin-bottom:3px">AI replenishment suggestion</div>
+              <div style="font-size:12px;color:#185FA5">Based on 30-day demand forecast, Metformin 500mg needs 500 units. Current stock (18) will last approximately 1.2 days. <strong>Recommend immediate replenishment request.</strong></div>
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <button style="padding:5px 12px;background:#185FA5;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer">Request 500 units</button>
+                <button style="padding:5px 12px;background:transparent;color:#185FA5;border:0.5px solid #185FA5;border-radius:4px;font-size:11px;cursor:pointer">Dismiss</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen" id="s-pos">
+        <div class="pos-grid">
+          <div>
+            <div class="section-title">Product catalogue</div>
+            <input class="product-search" placeholder="Search by name, SKU, or scan barcode...">
+            <div class="product-item"><div><strong style="font-size:12px">Paracetamol 500mg</strong><br><span style="font-size:11px;color:var(--color-text-secondary)">PCM-500 · Stock: 320 · Exp: Mar 2027</span></div><div style="text-align:right"><div style="font-size:13px;font-weight:500;margin-bottom:4px">₹12.50</div><button class="add-btn" onclick="addToCart('Paracetamol 500mg',12.50)">+ Add</button></div></div>
+            <div class="product-item rx"><div><strong style="font-size:12px">Metformin 500mg</strong> <span class="badge badge-blue" style="font-size:9px">Rx</span><br><span style="font-size:11px;color:var(--color-text-secondary)">MET-500 · Stock: 18 · Prescription required</span></div><div style="text-align:right"><div style="font-size:13px;font-weight:500;margin-bottom:4px">₹8.00</div><button class="add-btn" onclick="addToCart('Metformin 500mg',8.00)">+ Add</button></div></div>
+            <div class="product-item"><div><strong style="font-size:12px">Ibuprofen 400mg</strong><br><span style="font-size:11px;color:var(--color-text-secondary)">IBU-400 · Stock: 510 · Exp: Jan 2027</span></div><div style="text-align:right"><div style="font-size:13px;font-weight:500;margin-bottom:4px">₹6.00</div><button class="add-btn" onclick="addToCart('Ibuprofen 400mg',6.00)">+ Add</button></div></div>
+            <div class="product-item"><div><strong style="font-size:12px">Cetirizine 10mg</strong><br><span style="font-size:11px;color:var(--color-text-secondary)">CET-010 · Stock: 180 · Exp: Jun 2027</span></div><div style="text-align:right"><div style="font-size:13px;font-weight:500;margin-bottom:4px">₹9.50</div><button class="add-btn" onclick="addToCart('Cetirizine 10mg',9.50)">+ Add</button></div></div>
+            <div class="product-item"><div><strong style="font-size:12px">Atorvastatin 10mg</strong><br><span style="font-size:11px;color:var(--color-text-secondary)">ATV-010 · Stock: 85 · Low stock warning</span></div><div style="text-align:right"><div style="font-size:13px;font-weight:500;margin-bottom:4px">₹22.00</div><button class="add-btn" onclick="addToCart('Atorvastatin 10mg',22.00)">+ Add</button></div></div>
+          </div>
+          <div class="card" style="display:flex;flex-direction:column;height:fit-content">
+            <div class="section-title">Current cart</div>
+            <div id="cart-items" style="min-height:80px;margin-bottom:8px">
+              <div style="font-size:12px;color:var(--color-text-secondary);padding:20px 0;text-align:center">No items added yet</div>
+            </div>
+            <div style="border-top:0.5px solid var(--color-border-tertiary)">
+              <div class="cart-total"><span>Total</span><span id="cart-total">₹0.00</span></div>
+              <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px">Payment method</div>
+              <select class="form-select" style="margin-bottom:10px;font-size:12px">
+                <option>Cash</option><option>Card / UPI</option><option>Insurance</option>
+              </select>
+              <button class="pay-btn" onclick="processPayment()">Process payment</button>
+              <button style="width:100%;padding:7px;background:transparent;color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:12px;cursor:pointer;margin-top:6px" onclick="clearCart()">Clear cart</button>
+            </div>
+            <div id="receipt-msg" style="display:none;margin-top:10px;padding:10px;background:#EAF3DE;border-radius:var(--border-radius-md);font-size:11px;color:#3B6D11;text-align:center">
+              Transaction complete! Receipt generated.<br>Audit log written · Stock updated.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen" id="s-ai">
+        <div class="two-col" style="margin-bottom:14px">
+          <div class="card">
+            <div class="section-title">30-day demand forecast</div>
+            <div id="forecast-bars"></div>
+          </div>
+          <div class="card">
+            <div class="section-title">Anomaly detection — this week</div>
+            <div class="alert-item"><div class="alert-dot dot-red"></div><div style="font-size:12px"><strong>High severity</strong> — Ibuprofen return rate 4× above baseline (Tue–Thu). Possible batch quality issue.</div></div>
+            <div class="alert-item"><div class="alert-dot dot-amber"></div><div style="font-size:12px"><strong>Medium</strong> — Metformin sales spike (+180%) vs forecast on Mon. Bulk purchase by single customer.</div></div>
+            <div class="alert-item"><div class="alert-dot dot-green"></div><div style="font-size:12px"><strong>Resolved</strong> — Paracetamol stock discrepancy on Sat. Pharmacist annotated: "Manual count corrected."</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Conversational query — ask about your data</div>
+          <div id="ai-chat">
+            <div class="ai-msg bot"><div class="ai-tag">AI ASSISTANT</div>Hello! I can answer questions about your inventory, sales, forecasts, and compliance data. What would you like to know?</div>
+          </div>
+          <div class="ai-input-row" style="margin-top:10px">
+            <input class="ai-input" id="ai-q" placeholder="e.g. Which product had the most sales this week?" onkeydown="if(event.key==='Enter')sendAI()">
+            <button class="ai-send" onclick="sendAI()">Ask</button>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+            <button onclick="quickAsk('Which branch had most Paracetamol sales last week?')" style="padding:4px 8px;font-size:11px;border:0.5px solid var(--color-border-tertiary);border-radius:4px;background:transparent;cursor:pointer;color:var(--color-text-secondary)">Paracetamol sales</button>
+            <button onclick="quickAsk('Show products expiring before June 2026')" style="padding:4px 8px;font-size:11px;border:0.5px solid var(--color-border-tertiary);border-radius:4px;background:transparent;cursor:pointer;color:var(--color-text-secondary)">Expiring products</button>
+            <button onclick="quickAsk('Is Metformin stock sufficient for next month?')" style="padding:4px 8px;font-size:11px;border:0.5px solid var(--color-border-tertiary);border-radius:4px;background:transparent;cursor:pointer;color:var(--color-text-secondary)">Metformin forecast</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen" id="s-reports">
+        <div class="report-kpi-row">
+          <div class="metric"><div class="metric-label">Monthly revenue</div><div class="metric-value">₹14.2L</div><div class="metric-sub up">+9% vs last month</div></div>
+          <div class="metric"><div class="metric-label">Rx dispensed</div><div class="metric-value">3,842</div><div class="metric-sub">All audited</div></div>
+          <div class="metric"><div class="metric-label">Compliance score</div><div class="metric-value">98.4%</div><div class="metric-sub up">Above threshold</div></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="section-title" style="margin:0">Compliance & audit reports</div>
+            <div style="display:flex;gap:8px">
+              <select class="form-select" style="font-size:12px;padding:5px 8px"><option>This month</option><option>Last month</option><option>Last 90 days</option></select>
+              <button style="padding:5px 12px;background:#1F4E79;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:12px;cursor:pointer">Export PDF</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Report</th><th>Frequency</th><th>Last generated</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td>Controlled drug register</td><td>Daily</td><td>Today 07:00</td><td><span class="badge badge-green">Ready</span></td><td><span class="badge badge-blue" style="cursor:pointer">View</span></td></tr>
+                <tr><td>Stock variance report</td><td>Weekly</td><td>Mon 07:00</td><td><span class="badge badge-green">Ready</span></td><td><span class="badge badge-blue" style="cursor:pointer">View</span></td></tr>
+                <tr><td>Expiry compliance report</td><td>Monthly</td><td>01 Apr 07:00</td><td><span class="badge badge-green">Ready</span></td><td><span class="badge badge-blue" style="cursor:pointer">View</span></td></tr>
+                <tr><td>Prescription audit trail</td><td>On demand</td><td>3 days ago</td><td><span class="badge badge-green">Ready</span></td><td><span class="badge badge-blue" style="cursor:pointer">View</span></td></tr>
+                <tr><td>User activity log</td><td>On demand</td><td>1 day ago</td><td><span class="badge badge-green">Ready</span></td><td><span class="badge badge-blue" style="cursor:pointer">View</span></td></tr>
+                <tr><td>AI decision audit log</td><td>Weekly</td><td>Mon 07:00</td><td><span class="badge badge-amber">Generating</span></td><td><span class="badge badge-gray">Pending</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Top 5 products by revenue — this month</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Product</th><th>Units sold</th><th>Revenue</th><th>Category</th><th>Trend</th></tr></thead>
+              <tbody>
+                <tr><td>Paracetamol 500mg</td><td>4,820</td><td>₹60,250</td><td>OTC</td><td><span class="metric-sub up">+14%</span></td></tr>
+                <tr><td>Metformin 500mg</td><td>2,140</td><td>₹17,120</td><td>Rx</td><td><span class="metric-sub up">+6%</span></td></tr>
+                <tr><td>Atorvastatin 10mg</td><td>1,880</td><td>₹41,360</td><td>Rx</td><td><span class="metric-sub down">-3%</span></td></tr>
+                <tr><td>Ibuprofen 400mg</td><td>3,210</td><td>₹19,260</td><td>OTC</td><td><span class="metric-sub up">+2%</span></td></tr>
+                <tr><td>Amlodipine 5mg</td><td>1,540</td><td>₹23,100</td><td>Rx</td><td><span class="metric-sub up">+9%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+var cart={};
+var cartCount=0;
+
+var roleNames={"pharmacist":"Branch Pharmacist","admin":"Head Office Admin","inventory":"Inventory Controller","agent":"Customer Service Agent"};
+var roleAbbr={"pharmacist":"BP","admin":"HA","inventory":"IC","agent":"CS"};
+
+function doLogin(){
+  var r=document.getElementById('role-select').value;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-screen').style.display='flex';
+  document.getElementById('role-display').textContent=roleNames[r];
+  document.getElementById('topbar-role').textContent=roleNames[r];
+  document.getElementById('topbar-avatar').textContent=roleAbbr[r];
+}
+
+function doLogout(){
+  document.getElementById('app-screen').style.display='none';
+  document.getElementById('login-screen').style.display='block';
+  cart={};cartCount=0;
+  renderCart();
+}
+
+function showScreen(id,el){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  document.getElementById('s-'+id).classList.add('active');
+  el.classList.add('active');
+  var titles={"dashboard":"Dashboard","inventory":"Inventory Management","pos":"Point of Sale","ai":"AI Assistant","reports":"Reports & Compliance"};
+  document.getElementById('screen-title').textContent=titles[id];
+}
+
+var salesData=[22,35,48,60,75,88,95,84,90,72,65,55];
+function buildSalesBars(){
+  var wrap=document.getElementById('sales-bars');
+  if(!wrap)return;
+  var mx=Math.max.apply(null,salesData);
+  wrap.innerHTML='';
+  salesData.forEach(function(v){
+    var b=document.createElement('div');
+    b.className='bar';
+    b.style.height=Math.round(v/mx*95)+'px';
+    b.title='₹'+v+'k';
+    wrap.appendChild(b);
+  });
+}
+
+var forecastData=[
+  {label:"Paracetamol 500mg",val:480,max:600},
+  {label:"Metformin 500mg",val:280,max:600},
+  {label:"Ibuprofen 400mg",val:390,max:600},
+  {label:"Cetirizine 10mg",val:160,max:600},
+  {label:"Atorvastatin 10mg",val:310,max:600},
+];
+function buildForecast(){
+  var wrap=document.getElementById('forecast-bars');
+  if(!wrap)return;
+  wrap.innerHTML='';
+  forecastData.forEach(function(d){
+    var row=document.createElement('div');
+    row.className='forecast-bar-row';
+    row.innerHTML='<div class="forecast-bar-label">'+d.label+'</div><div class="forecast-bar-track"><div class="forecast-bar-fill" style="width:'+Math.round(d.val/d.max*100)+'%"></div></div><div class="forecast-bar-val">'+d.val+' u</div>';
+    wrap.appendChild(row);
+  });
+}
+
+function addToCart(name,price){
+  if(cart[name]){cart[name].qty+=1;}
+  else{cart[name]={price:price,qty:1};}
+  renderCart();
+}
+
+function renderCart(){
+  var wrap=document.getElementById('cart-items');
+  var items=Object.keys(cart);
+  if(!items.length){wrap.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary);padding:20px 0;text-align:center">No items added yet</div>';document.getElementById('cart-total').textContent='₹0.00';return;}
+  var total=0;var html='';
+  items.forEach(function(k){var it=cart[k];total+=it.price*it.qty;html+='<div class="cart-item"><div><div style="font-size:12px;font-weight:500">'+k+'</div><div style="font-size:11px;color:var(--color-text-secondary)">₹'+it.price.toFixed(2)+' × '+it.qty+'</div></div><div style="font-size:13px;font-weight:500">₹'+(it.price*it.qty).toFixed(2)+'</div></div>';});
+  wrap.innerHTML=html;
+  document.getElementById('cart-total').textContent='₹'+total.toFixed(2);
+}
+
+function clearCart(){cart={};renderCart();document.getElementById('receipt-msg').style.display='none';}
+
+function processPayment(){
+  if(!Object.keys(cart).length)return;
+  cart={};renderCart();
+  var msg=document.getElementById('receipt-msg');
+  msg.style.display='block';
+  setTimeout(function(){msg.style.display='none';},4000);
+}
+
+var aiResponses={
+  'Which branch had most Paracetamol sales last week?':'Branch 7 (Sector 17) led with 1,240 units sold last week, followed by Branch 12 (890 units) and Branch 3 (780 units). <em>Query scope: your authorised branches only. SQL: SELECT branch_id, SUM(qty) FROM sales WHERE product_id=\'PCM-500\' AND date>=NOW()-INTERVAL 7 DAY GROUP BY 1 ORDER BY 2 DESC.</em>',
+  'Show products expiring before June 2026':'Found 3 products expiring before June 2026 in your branch: (1) Amoxicillin 500mg — Batch B-1042, 240 units, expires 17 Apr 2026. (2) Metformin 500mg — Batch B-2201, 18 units, expires 01 Sep 2026. <strong>Recommend prioritising dispatch of near-expiry batches.</strong>',
+  'Is Metformin stock sufficient for next month?':'Current stock: 18 units. Forecasted 30-day demand: 280 units. <strong>Stock is critically insufficient.</strong> Recommended order: 500 units. AI confidence: 91%. Note: Batch B-2201 also expires Sep 2026 — factor into order timing. <em>All AI suggestions require Inventory Controller approval before PO creation.</em>'
+};
+
+function sendAI(){
+  var q=document.getElementById('ai-q').value.trim();
+  if(!q)return;
+  var chat=document.getElementById('ai-chat');
+  chat.innerHTML+='<div class="ai-msg user"><div class="ai-tag">YOU</div>'+q+'</div>';
+  var ans=aiResponses[q]||'Based on current operational data, I\'ve analysed the relevant records. For detailed insights on "'+q+'", the system queries the reporting replica using read-only SELECT statements scoped to your authorised branch. <em>PII masked per your role. All queries logged for compliance.</em>';
+  setTimeout(function(){chat.innerHTML+='<div class="ai-msg bot"><div class="ai-tag">AI ASSISTANT (read-only · audited)</div>'+ans+'</div>';chat.scrollTop=chat.scrollHeight;},600);
+  document.getElementById('ai-q').value='';
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function quickAsk(q){document.getElementById('ai-q').value=q;sendAI();}
+
+buildSalesBars();
+buildForecast();
+</script>
